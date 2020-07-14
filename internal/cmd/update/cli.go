@@ -6,6 +6,7 @@ package update
 
 import (
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/acidobinario/go-twitter/twitter"
@@ -69,11 +70,14 @@ func Run(cc *cli.Context) error {
 	for {
 		now := time.Now()
 		days := now.Sub(quarantineDate).Hours() / 24
-		newName := fmt.Sprintf("%s stayed at home for %d days", cc.String("username-prefix"), int(days))
+		newName := fmt.Sprintf("%s stayed at home for %.2f days", cc.String("username-prefix"), days)
 		_, _, err = client.Accounts.UpdateProfile(&twitter.UpdateProfileParams{Name: newName})
+
 		if err != nil {
 			return fmt.Errorf("[ERROR] Could not update the profile, err: %s", err.Error())
 		}
-		time.Sleep(time.Duration(24) * time.Hour)
+
+		log.Printf("[DEBUG] Username Updated with: %s\n", newName)
+		time.Sleep(time.Duration(30) * time.Minute)
 	}
 }
